@@ -1,0 +1,57 @@
+
+import socket
+import sys
+from datetime import datetime
+from turtledemo.forest import start
+
+remoteServer    = input("Enter a remote host to scan: ")
+remoteServerIP  = socket.gethostbyname(remoteServer)
+
+resultFile = open("christianPortScanner.txt","w") #a--append mode, w--write, r--read mode
+
+# Print a nice banner with information on which host we are about to scan
+print ("-" * 50)
+print ("Please wait, scanning remote host", remoteServerIP)
+print ("-" * 50)
+
+# Check what time the scan started
+startTime = datetime.now()
+resultFile.write("Start Time:  " + str(startTime))
+print("Start Time:  " + str(startTime) + "\n")
+
+try:
+    for port in range(1,1025):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(0.001)
+        result = sock.connect_ex((remoteServerIP, port))
+        if result == 0:
+            print ("Port {}: 	 Open".format(port))
+            resultFile.write("\nPort {}: 	 Open".format(port))
+        #else:
+        #    print("Port {}: 	 Closed".format(port))
+        sock.close()
+
+except KeyboardInterrupt:
+    print ("You pressed Ctrl+C")
+    sys.exit()
+
+except socket.gaierror:
+    print ('Hostname could not be resolved. Exiting')
+    sys.exit()
+
+except socket.error:
+    print ("Couldn't connect to server")
+    sys.exit()
+
+# Checking the time again
+endTime = datetime.now()
+resultFile.write("\nEnd Time:  " + str(startTime))
+print("\nStart Time:  " + str(startTime) + "\n")
+
+
+# Calculates the difference of time, to see how long it took to run the script
+totalTime =  endTime - startTime
+
+# Printing the information to screen
+print ('\nTotal Scan Time: ', totalTime)
+resultFile.write("\n\nTotal Scan Time:  " + str(startTime))
